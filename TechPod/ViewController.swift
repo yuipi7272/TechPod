@@ -23,6 +23,8 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     
     // 音楽を再生するための変数
     var audioPlayer: AVAudioPlayer!
+    // 現在の曲番号
+    var songNum: Int = 0
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -46,10 +48,10 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         if audioPlayer.isPlaying {
             // BarButtonItemを一時停止のものに変える
             playPauseButton = UIBarButtonItem(barButtonSystemItem: UIBarButtonItem.SystemItem.pause, target: self, action: #selector(self.playPause))
-            toolBar.items![1] = playPauseButton
+            toolBar.items![2] = playPauseButton
         } else {
             playPauseButton = UIBarButtonItem(barButtonSystemItem: UIBarButtonItem.SystemItem.play, target: self, action: #selector(self.playPause))
-            toolBar.items![1] = playPauseButton
+            toolBar.items![2] = playPauseButton
         }
     }
     // 曲を再生 / 一時停止する
@@ -67,6 +69,67 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
             setBarButtonItem()
         }
     }
+    
+    // 引数の曲番号(num)のセルへのIndexPathを取得し、解除
+    func deselectCell(num: Int){
+        let nowIndexPath = IndexPath(row: num, section: 0)
+        table.deselectRow(at: nowIndexPath, animated: true)
+        table.cellForRow(at: nowIndexPath)?.accessoryType = .none
+    }
+    // 引数の曲番号(num)のセルへのIndexPathを取得し、選択
+    func selectCell(num: Int){
+        let nextIndexPath = IndexPath(row: songNum, section: 0)
+        table.selectRow(at: nextIndexPath, animated: true, scrollPosition: .none)
+        table.cellForRow(at: nextIndexPath)?.accessoryType = .checkmark
+    }
+    // 引数の曲番号(num)の曲を再生する
+    func playSong(num: Int){
+        // 音楽ファイルの設定
+        let audioPath = URL(fileURLWithPath: Bundle.main.path(forResource: fileNameArray[num], ofType: "mp3")!)
+        // 再生の準備
+        audioPlayer = try? AVAudioPlayer(contentsOf: audioPath)
+        
+        // 音楽を再生
+        audioPlayer.play()
+    }
+    
+    // 前の曲を再生する
+    @IBAction func back(){
+        // 今流れている曲のセルへのIndexPathを取得し、解除
+        deselectCell(num: songNum)
+        
+        // もし現在流している曲がリストの最後の曲であるならば、
+        if songNum == 0 {
+            // 最初の曲を選ぶ
+            songNum = songNameArray.count - 1
+        } else {
+            // それ以外は前の曲を選ぶ
+            songNum = songNum - 1
+        }
+        // 次に流す曲のセルへのIndexPathを取得し、選択
+        selectCell(num: songNum)
+        playSong(num: songNum)
+    }
+    // 次の曲を再生する
+    @IBAction func next(){
+        // 今流れている曲のセルへのIndexPathを取得し、解除
+        deselectCell(num: songNum)
+        
+        // もし現在流している曲がリストの最後の曲であるならば、
+        if songNum == fileNameArray.count - 1 {
+            // 最初の曲を選ぶ
+            songNum = 0
+        } else {
+            // それ以外は次の曲を選ぶ
+            songNum = songNum + 1
+        }
+        // 次に流す曲のセルへのIndexPathを取得し、選択
+        selectCell(num: songNum)
+        
+        // 曲を流す
+        playSong(num: songNum)
+    }
+    
     // ■ テービルビューのデータソースメソッド
     // セルの数を設定
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -92,15 +155,11 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     // ■ テービルビューのデリゲートメソッド
     // セルが押されたときに呼ばれるメソッド
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        print("\(songNameArray[indexPath.row])が選ばれました！")
+        songNum = indexPath.row
+        print("\(songNameArray[songNum])が選ばれました！")
         
-        // 音楽ファイルの設定
-        let audioPath = URL(fileURLWithPath: Bundle.main.path(forResource: fileNameArray[indexPath.row], ofType: "mp3")!)
-        // 再生の準備
-        audioPlayer = try? AVAudioPlayer(contentsOf: audioPath)
-        
-        // 音楽を再生
-        audioPlayer.play()
+        // 引数への曲を再生する
+        playSong(num: songNum)
         
         // セルにチェックマークを追加する
         tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark

@@ -35,6 +35,11 @@
                                 <rect key="frame" x="0.0" y="623" width="375" height="44"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                 <items>
+                                    <barButtonItem systemItem="rewind" id="wlK-Cu-t4U">
+                                        <connections>
+                                            <action selector="back" destination="BYZ-38-t0r" id="cuY-q5-9zn"/>
+                                        </connections>
+                                    </barButtonItem>
                                     <barButtonItem style="plain" systemItem="flexibleSpace" id="vJD-ar-G4y"/>
                                     <barButtonItem systemItem="pause" id="H3v-Qh-L0t">
                                         <connections>
@@ -42,6 +47,11 @@
                                         </connections>
                                     </barButtonItem>
                                     <barButtonItem style="plain" systemItem="flexibleSpace" id="Wz8-zV-PbS"/>
+                                    <barButtonItem systemItem="fastForward" id="xUR-9a-pGF">
+                                        <connections>
+                                            <action selector="next" destination="BYZ-38-t0r" id="q3X-lt-q7C"/>
+                                        </connections>
+                                    </barButtonItem>
                                 </items>
                             </toolbar>
                         </subviews>
