@@ -12,6 +12,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
 
     // StoryBoardで扱うTableViewを宣言
     @IBOutlet var table: UITableView!
+    @IBOutlet var toolBar: UIToolbar!
     
     // 曲名を入れる配列
     var songNameArray = [String]()
@@ -35,8 +36,37 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         fileNameArray = ["cannon", "elise", "aria"]
         // imageNameArrayに曲の画像を入れる
         imageNameArray = ["Pachelbel.jpg", "Beethoven.jpg", "Bach.jpg"]
+        // ツールバーを非表示にしておく
+        toolBar.isHidden = true
     }
-    
+    // ツールバーの再生 / 停止ボタン(BarButtonItem)の見た目を変更
+    func setBarButtonItem() {
+        var playPauseButton: UIBarButtonItem!
+        // 曲が再生中であれば、一時停止のものに
+        if audioPlayer.isPlaying {
+            // BarButtonItemを一時停止のものに変える
+            playPauseButton = UIBarButtonItem(barButtonSystemItem: UIBarButtonItem.SystemItem.pause, target: self, action: #selector(self.playPause))
+            toolBar.items![1] = playPauseButton
+        } else {
+            playPauseButton = UIBarButtonItem(barButtonSystemItem: UIBarButtonItem.SystemItem.play, target: self, action: #selector(self.playPause))
+            toolBar.items![1] = playPauseButton
+        }
+    }
+    // 曲を再生 / 一時停止する
+    @IBAction func playPause(){
+        // 曲が再生中であれば、
+        if audioPlayer.isPlaying{
+            // 曲を一時停止
+            audioPlayer.pause()
+            // ツールバーの再生 / 停止ボタンの見た目を変更
+            setBarButtonItem()
+        } else {
+            // 曲を再生
+            audioPlayer.play()
+            // ツールバーの再生 / 停止ボタンの見た目を変更
+            setBarButtonItem()
+        }
+    }
     // ■ テービルビューのデータソースメソッド
     // セルの数を設定
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -71,6 +101,20 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         
         // 音楽を再生
         audioPlayer.play()
+        
+        // セルにチェックマークを追加する
+        tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
+        
+        // ツールバーの再生 / 停止ボタンの見た目を変える
+        setBarButtonItem()
+        // ツールバーを表示する
+        if toolBar.isHidden {
+            toolBar.isHidden = false
+        }
+    }
+    // セルの選択が外れたときに呼び出されるメソッド
+    func tableView(_ tableView: UITableView, didDeselectRowAt indexPath: IndexPath) {
+        tableView.cellForRow(at:indexPath)?.accessoryType = .none
     }
 }
 
